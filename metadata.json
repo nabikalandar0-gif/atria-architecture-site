@@ -1,0 +1,6 @@
+{
+  "name": "Atria Architecture — Luxury Architectural Design Studio & Portfolio",
+  "description": "Official interactive portfolio, project showcase, intelligent spatial feasibility estimator, and design consultation platform for Atria Architecture & Building Design Studio.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

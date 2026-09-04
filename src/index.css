@@ -1,0 +1,313 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Cinzel:wght@500;700;900&display=swap');
+
+@layer base {
+  :root {
+    --font-vazir: 'Vazirmatn', 'Vazir', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-iransans: 'IRANSans', 'IranSans', 'IRANSansX', 'Vazirmatn', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--font-vazir);
+  }
+
+  body {
+    font-family: var(--font-vazir);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  [dir="ltr"], [dir="ltr"] body {
+    font-family: var(--font-sans);
+  }
+
+  [dir="rtl"], [dir="rtl"] body, [dir="rtl"] button, [dir="rtl"] input, [dir="rtl"] select, [dir="rtl"] textarea {
+    font-family: var(--font-vazir) !important;
+  }
+}
+
+.font-vazir {
+  font-family: 'Vazirmatn', 'Vazir', system-ui, -apple-system, sans-serif !important;
+}
+
+.font-iransans {
+  font-family: 'IRANSans', 'IranSans', 'IRANSansX', 'Vazirmatn', system-ui, sans-serif !important;
+}
+
+.font-serif-architect {
+  font-family: 'Cinzel', serif;
+}
+
+/* Photo Overlay Badges & Controls - High contrast on top of images in both Dark & Light themes */
+.photo-overlay-badge,
+.photo-overlay-control {
+  background-color: rgba(12, 10, 9, 0.90) !important;
+  color: #fafaf9 !important;
+  border: 1px solid rgba(87, 83, 78, 0.75) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.photo-overlay-control:hover {
+  background-color: rgba(28, 25, 23, 0.95) !important;
+  color: #ffffff !important;
+  border-color: rgba(251, 191, 36, 0.8) !important;
+}
+
+.photo-overlay-badge-active {
+  background-color: #fbbf24 !important;
+  color: #0c0a09 !important;
+  border-color: #f59e0b !important;
+  font-weight: 700 !important;
+}
+
+.photo-overlay-concept {
+  background: linear-gradient(to top, rgba(12, 10, 9, 0.98) 0%, rgba(12, 10, 9, 0.88) 60%, rgba(12, 10, 9, 0) 100%) !important;
+}
+
+.photo-overlay-concept p {
+  color: #f5f5f4 !important;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0c0a09;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #292524;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #44403c;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Light Mode Aesthetic Palette */
+html.light {
+  color-scheme: light;
+  background-color: #f8f7f4;
+  color: #1c1917;
+}
+
+html.light body {
+  background-color: #f8f7f4;
+  color: #1c1917;
+}
+
+/* Sections & standard cards in light mode */
+html.light section:not(#hero),
+html.light footer {
+  background-color: #f8f7f4 !important;
+}
+
+/* Hero Section: Maintains cinematic dark architectural presence with high contrast white & gold text */
+html.light #hero {
+  background-color: #0c0a09 !important;
+  color: #f5f5f4 !important;
+}
+
+html.light #hero h1,
+html.light #hero h1 span,
+html.light #hero .text-stone-100 {
+  color: #fafaf9 !important;
+}
+
+html.light #hero p,
+html.light #hero .text-stone-300 {
+  color: #e7e5e4 !important;
+}
+
+html.light #hero .text-stone-400 {
+  color: #d6d3d1 !important;
+}
+
+html.light #hero .border-stone-800,
+html.light #hero .border-stone-800\/80,
+html.light #hero .border-stone-700 {
+  border-color: rgba(120, 113, 108, 0.4) !important;
+}
+
+html.light #hero .bg-stone-950,
+html.light #hero .bg-stone-950\/95 {
+  background-color: rgba(12, 10, 9, 0.85) !important;
+}
+
+html.light #hero .bg-stone-900\/80,
+html.light #hero .bg-stone-900\/90 {
+  background-color: rgba(28, 25, 23, 0.9) !important;
+}
+
+html.light #hero button:not(.bg-stone-100) {
+  color: #fafaf9 !important;
+}
+
+html.light #hero .text-amber-400 {
+  color: #fbbf24 !important;
+}
+
+/* Non-hero containers in Light Mode */
+html.light section:not(#hero) .bg-stone-950,
+html.light section:not(#hero) .bg-stone-950\/90,
+html.light section:not(#hero) .bg-stone-950\/98 {
+  background-color: #f8f7f4 !important;
+}
+
+html.light section:not(#hero) .bg-stone-900 {
+  background-color: #ffffff !important;
+}
+
+html.light section:not(#hero) .bg-stone-900\/40,
+html.light section:not(#hero) .bg-stone-900\/60,
+html.light section:not(#hero) .bg-stone-900\/70,
+html.light section:not(#hero) .bg-stone-900\/80,
+html.light section:not(#hero) .bg-stone-900\/90 {
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+}
+
+html.light section:not(#hero) .bg-stone-850 {
+  background-color: #f3f1ec !important;
+}
+
+html.light section:not(#hero) .bg-stone-800,
+html.light section:not(#hero) .bg-stone-800\/80,
+html.light section:not(#hero) .bg-stone-800\/90 {
+  background-color: #edebe4 !important;
+}
+
+/* Light Mode Typography for content sections */
+html.light section:not(#hero) .text-stone-100,
+html.light footer .text-stone-100 {
+  color: #1c1917 !important;
+}
+
+html.light section:not(#hero) .text-stone-200,
+html.light footer .text-stone-200 {
+  color: #292524 !important;
+}
+
+html.light section:not(#hero) .text-stone-300,
+html.light footer .text-stone-300 {
+  color: #44403c !important;
+}
+
+html.light section:not(#hero) .text-stone-400,
+html.light footer .text-stone-400 {
+  color: #57534e !important;
+}
+
+html.light section:not(#hero) .text-stone-500,
+html.light footer .text-stone-500 {
+  color: #78716c !important;
+}
+
+/* Borders in Light Mode */
+html.light section:not(#hero) .border-stone-850,
+html.light section:not(#hero) .border-stone-800,
+html.light section:not(#hero) .border-stone-800\/80,
+html.light section:not(#hero) .border-stone-750,
+html.light section:not(#hero) .border-stone-700,
+html.light footer .border-stone-800 {
+  border-color: #e2ded5 !important;
+}
+
+/* Inputs in Light Mode */
+html.light input,
+html.light select,
+html.light textarea {
+  background-color: #ffffff !important;
+  color: #1c1917 !important;
+  border-color: #d6d3d1 !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #8c8680 !important;
+}
+
+/* Modal and dialogs in light mode */
+html.light .fixed .bg-stone-900 {
+  background-color: #ffffff !important;
+  color: #1c1917 !important;
+}
+
+html.light .fixed .bg-stone-950,
+html.light .fixed .bg-stone-950\/90 {
+  background-color: #f8f7f4 !important;
+}
+
+html.light .fixed .text-stone-100 {
+  color: #1c1917 !important;
+}
+
+html.light .fixed .text-stone-300 {
+  color: #44403c !important;
+}
+
+html.light .fixed .text-stone-400 {
+  color: #57534e !important;
+}
+
+html.light .fixed .border-stone-800,
+html.light .fixed .border-stone-700 {
+  border-color: #e2ded5 !important;
+}
+
+/* Ensure Amber brand accents pop with high contrast */
+html.light section:not(#hero) .text-amber-400,
+html.light footer .text-amber-400,
+html.light .fixed .text-amber-400 {
+  color: #b45309 !important;
+}
+
+html.light ::-webkit-scrollbar-track {
+  background: #f1efe9;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+}
+
+/* Print Optimization for Architectural Datasheets */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Hide navigation, background layers, non-modal content when printing monograph */
+  nav,
+  header,
+  section,
+  footer,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  .print\:block {
+    display: block !important;
+  }
+
+  @page {
+    margin: 1.5cm;
+    size: auto;
+  }
+}
+
+
