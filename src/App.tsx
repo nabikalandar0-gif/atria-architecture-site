@@ -9,7 +9,6 @@ import { ArchitecturalArticles } from './components/ArchitecturalArticles';
 import { BeforeAfterRenovation } from './components/BeforeAfterRenovation';
 import { InteractiveSpatialExplorer } from './components/InteractiveSpatialExplorer';
 import { CostAndFeasibilityEstimator } from './components/CostAndFeasibilityEstimator';
-import { AISpatialConsultant } from './components/AISpatialConsultant';
 import { StudioPhilosophy } from './components/StudioPhilosophy';
 import { ConsultationModal } from './components/ConsultationModal';
 import { Footer } from './components/Footer';
@@ -94,12 +93,6 @@ function MainSite() {
           language={language}
           onBookConsultationWithData={(summary) => handleOpenConsultation(summary)}
         />
-
-        <AISpatialConsultant
-          language={language}
-          onBookConsultation={(conceptTitle) => handleOpenConsultation(`Concept: ${conceptTitle}`)}
-        />
-
         <ArchitecturalArticles
           language={language}
           onBookConsultation={(topic) => handleOpenConsultation(`Article Inquiry: ${topic}`)}
