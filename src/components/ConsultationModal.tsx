@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import { Language } from '../types';
 import { STUDIO_INFO } from '../data/atriaData';
-import { X, Phone, Calendar, Mail, MapPin, CheckCircle, Send, MessageSquare, Sparkles, Building } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import {
+  X,
+  Phone,
+  Mail,
+  CheckCircle,
+  Send,
+} from 'lucide-react';
 
 interface ConsultationModalProps {
   isOpen: boolean;
@@ -30,23 +37,87 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
+    setErrorMsg('');
+
+    const phoneEmail = [formData.phone, formData.email]
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .join(' | ');
+
+    const meetingLabel =
+      formData.meetingType === 'atelier'
+        ? isFa
+          ? 'حضوری در آتلیه'
+          : 'Atelier Visit'
+        : formData.meetingType === 'site'
+          ? isFa
+            ? 'بازدید از زمین'
+            : 'On-Site Inspection'
+          : isFa
+            ? 'آنلاین'
+            : 'Online Video';
+
+    const { error } = await supabase.from('consultation_requests').insert([
+      {
+        client_name: formData.name.trim(),
+        phone_email: phoneEmail || null,
+        project_type: formData.projectType || null,
+        location: formData.location.trim() || null,
+        estimated_budget: formData.estimatedArea
+          ? `${isFa ? 'مساحت حدودی' : 'Approx area'}: ${formData.estimatedArea}`
+          : null,
+        notes: [
+          formData.notes?.trim(),
+          `${isFa ? 'نوع جلسه' : 'Meeting type'}: ${meetingLabel}`,
+        ]
+          .filter(Boolean)
+          .join('\n') || null,
+        status: 'pending',
+      },
+    ]);
+
+    setSubmitting(false);
+
+    if (error) {
+      console.error('consultation insert error:', error);
+      setErrorMsg(
+        isFa
+          ? 'خطا در ثبت درخواست. لطفاً دوباره تلاش کنید.'
+          : 'Failed to submit. Please try again.'
+      );
+      return;
+    }
+
     setSubmitted(true);
   };
 
   const handleReset = () => {
     setSubmitted(false);
+    setErrorMsg('');
+    setFormData({
+      name: '',
+      phone: '',
+      email: '',
+      projectType: 'Villa / Estate Design',
+      location: '',
+      estimatedArea: '',
+      meetingType: 'atelier',
+      notes: '',
+    });
     onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
       <div className="bg-stone-900 border border-stone-800 rounded-2xl max-w-xl w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-        
         {/* Header */}
         <div className="p-4 sm:p-5 border-b border-stone-800 flex items-center justify-between bg-stone-950">
           <div className="flex items-center gap-2.5">
@@ -55,10 +126,14 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-stone-100 text-sm sm:text-base">
-                {isFa ? 'رزرو جلسه مشاوره و طراحی معماری' : 'Book Architectural Consultation'}
+                {isFa
+                  ? 'رزرو جلسه مشاوره و طراحی معماری'
+                  : 'Book Architectural Consultation'}
               </h3>
               <p className="text-[11px] text-stone-400">
-                {isFa ? 'استودیو معماری و طراحی ساختمان آتریا' : 'Atria Architecture Studio'}
+                {isFa
+                  ? 'استودیو معماری و طراحی ساختمان آتریا'
+                  : 'Atria Architecture Studio'}
               </p>
             </div>
           </div>
@@ -79,7 +154,9 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
                 <CheckCircle className="w-8 h-8" />
               </div>
               <h4 className="text-lg font-bold text-stone-100">
-                {isFa ? 'درخواست مشاوره شما با موفقیت ثبت شد' : 'Consultation Request Registered'}
+                {isFa
+                  ? 'درخواست مشاوره شما با موفقیت ثبت شد'
+                  : 'Consultation Request Registered'}
               </h4>
               <p className="text-xs text-stone-300 max-w-md mx-auto leading-relaxed">
                 {isFa
@@ -88,7 +165,11 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
               </p>
 
               <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 text-xs text-stone-400 space-y-1">
-                <div>{isFa ? 'تماس مستقیم با دبیرخانه آتلیه:' : 'Direct Studio Line:'}</div>
+                <div>
+                  {isFa
+                    ? 'تماس مستقیم با دبیرخانه آتلیه:'
+                    : 'Direct Studio Line:'}
+                </div>
                 <div className="font-mono text-amber-400 font-bold text-sm">
                   {STUDIO_INFO.phone}
                 </div>
@@ -103,10 +184,11 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
-              
               {initialTopic && (
                 <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300">
-                  <span className="font-bold">{isFa ? 'موضوع ارجاعی: ' : 'Referenced Subject: '}</span>
+                  <span className="font-bold">
+                    {isFa ? 'موضوع ارجاعی: ' : 'Referenced Subject: '}
+                  </span>
                   {initialTopic}
                 </div>
               )}
@@ -121,7 +203,9 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
                     type="text"
                     required
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     placeholder={isFa ? 'مثال: مهندس رادمهر' : 'e.g. David Vance'}
                     className="w-full p-2.5 rounded-lg bg-stone-950 border border-stone-800 text-xs text-stone-100 focus:border-amber-400 focus:outline-none"
                   />
@@ -135,7 +219,9 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
                     type="tel"
                     required
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, phone: e.target.value })
+                    }
                     placeholder="+98 912 000 0000"
                     className="w-full p-2.5 rounded-lg bg-stone-950 border border-stone-800 text-xs text-stone-100 focus:border-amber-400 focus:outline-none font-mono"
                   />
@@ -151,7 +237,9 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
                   <input
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     placeholder="client@domain.com"
                     className="w-full p-2.5 rounded-lg bg-stone-950 border border-stone-800 text-xs text-stone-100 focus:border-amber-400 focus:outline-none"
                   />
@@ -164,8 +252,14 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
                   <input
                     type="text"
                     value={formData.location}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    placeholder={isFa ? 'مثال: لواسان، زعفرانیه، کیش، دبی' : 'e.g. Lavasan, Tehran, Dubai'}
+                    onChange={(e) =>
+                      setFormData({ ...formData, location: e.target.value })
+                    }
+                    placeholder={
+                      isFa
+                        ? 'مثال: لواسان، زعفرانیه، کیش، دبی'
+                        : 'e.g. Lavasan, Tehran, Dubai'
+                    }
                     className="w-full p-2.5 rounded-lg bg-stone-950 border border-stone-800 text-xs text-stone-100 focus:border-amber-400 focus:outline-none"
                   />
                 </div>
@@ -174,18 +268,34 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
               {/* Meeting Type */}
               <div>
                 <label className="block text-xs text-stone-400 mb-1 font-medium">
-                  {isFa ? 'نوع جلسه مشاوره مدنظر:' : 'Preferred Meeting Format:'}
+                  {isFa
+                    ? 'نوع جلسه مشاوره مدنظر:'
+                    : 'Preferred Meeting Format:'}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { id: 'atelier', labelEn: 'Atelier Visit', labelFa: 'حضوری در آتلیه زعفرانیه' },
-                    { id: 'site', labelEn: 'On-Site Inspection', labelFa: 'بازدید از زمین پروژه' },
-                    { id: 'online', labelEn: 'Online Video', labelFa: 'جلسه آنلاین تصویری' },
+                    {
+                      id: 'atelier',
+                      labelEn: 'Atelier Visit',
+                      labelFa: 'حضوری در آتلیه زعفرانیه',
+                    },
+                    {
+                      id: 'site',
+                      labelEn: 'On-Site Inspection',
+                      labelFa: 'بازدید از زمین پروژه',
+                    },
+                    {
+                      id: 'online',
+                      labelEn: 'Online Video',
+                      labelFa: 'جلسه آنلاین تصویری',
+                    },
                   ].map((m) => (
                     <button
                       type="button"
                       key={m.id}
-                      onClick={() => setFormData({ ...formData, meetingType: m.id })}
+                      onClick={() =>
+                        setFormData({ ...formData, meetingType: m.id })
+                      }
                       className={`p-2 rounded-lg text-[11px] font-medium border transition-all cursor-pointer text-center ${
                         formData.meetingType === m.id
                           ? 'bg-amber-500 text-stone-950 font-bold border-amber-500'
@@ -198,49 +308,75 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
                 </div>
               </div>
 
-              {/* Additional Brief Notes */}
+              {/* Notes */}
               <div>
                 <label className="block text-xs text-stone-400 mb-1 font-medium">
-                  {isFa ? 'توضیحات و نیازمندی‌های اولیه پروژه:' : 'Project Notes / Scope:'}
+                  {isFa
+                    ? 'توضیحات و نیازمندی‌های اولیه پروژه:'
+                    : 'Project Notes / Scope:'}
                 </label>
                 <textarea
                   rows={3}
                   value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  placeholder={isFa ? 'متراژ حدودی، تعداد طبقات یا خواسته‌های شاخص...' : 'Approximate plot area, floors, unique requirements...'}
+                  onChange={(e) =>
+                    setFormData({ ...formData, notes: e.target.value })
+                  }
+                  placeholder={
+                    isFa
+                      ? 'متراژ حدودی، تعداد طبقات یا خواسته‌های شاخص...'
+                      : 'Approximate plot area, floors, unique requirements...'
+                  }
                   className="w-full p-2.5 rounded-lg bg-stone-950 border border-stone-800 text-xs text-stone-100 focus:border-amber-400 focus:outline-none resize-none"
                 />
               </div>
 
+              {errorMsg && (
+                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-300">
+                  {errorMsg}
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
+                disabled={submitting}
+                className="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-60 text-stone-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
               >
                 <Send className="w-4 h-4 text-stone-950" />
-                <span>{isFa ? 'ثبت و ارسال درخواست مشاوره' : 'Submit Consultation Request'}</span>
+                <span>
+                  {submitting
+                    ? isFa
+                      ? 'در حال ارسال...'
+                      : 'Sending...'
+                    : isFa
+                      ? 'ثبت و ارسال درخواست مشاوره'
+                      : 'Submit Consultation Request'}
+                </span>
               </button>
 
-              {/* Direct Hotline strip */}
               <div className="pt-3 border-t border-stone-800 flex flex-wrap items-center justify-between gap-2 text-[11px] text-stone-400">
                 <span className="flex items-center gap-1.5">
                   <Phone className="w-3.5 h-3.5 text-amber-400" />
                   <span>{isFa ? 'تماس مستقیم:' : 'Direct Phone:'}</span>
-                  <a href="tel:09389951723" className="font-mono text-amber-400 hover:underline font-bold dir-ltr">
+                  <a
+                    href="tel:09389951723"
+                    className="font-mono text-amber-400 hover:underline font-bold dir-ltr"
+                  >
                     0938 995 1723
                   </a>
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Mail className="w-3.5 h-3.5 text-amber-400" />
-                  <a href="mailto:nabikalandar0@gmail.com" className="font-mono text-stone-300 hover:text-amber-400">
+                  <a
+                    href="mailto:nabikalandar0@gmail.com"
+                    className="font-mono text-stone-300 hover:text-amber-400"
+                  >
                     nabikalandar0@gmail.com
                   </a>
                 </span>
               </div>
-
             </form>
           )}
         </div>
-
       </div>
     </div>
   );
